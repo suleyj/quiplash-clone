@@ -7,15 +7,23 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "*"
-    }
+        origin: "*",
+    },
 });
 
 app.use(cors());
 
+const clients = [];
+const rooms = [];
+
 io.on("connection", (socket) => {
-    console.log("a user connected");
-});
+    clients.push(socket);
+    socket.on("createRoom", (socket) => {
+        // socket.join(`room-${rooms.length}`);
+        rooms.push(`rooms-${rooms.length}`);
+        console.log(rooms)
+    });
+}); 
 
 app.get("/test", (req, res) => {
     res.send({ some: "text" });

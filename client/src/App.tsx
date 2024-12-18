@@ -4,7 +4,7 @@ import { socket } from "./socket";
 
 function App() {
   const [isConnected, setIsConnected] = useState(socket.connected);
-  const [fooEvents, setFooEvents] = useState([]);
+  // const [fooEvents, setFooEvents] = useState([]);
 
   useEffect(() => {
     function onConnect() {
@@ -30,6 +30,10 @@ function App() {
     };
   }, []);
 
+  const createRoom = () => {
+    socket.emit("createRoom", socket);
+  }
+
   return (
     <>
       <div className="hero bg-base-200 min-h-screen">
@@ -43,7 +47,7 @@ function App() {
               comedy champion! Perfect for game nights, parties, and online
               hangouts. Laughter guaranteed!"
             </p>
-            <button className="btn btn-primary mb-4">START GAME</button>
+            <button className="btn btn-primary mb-4" onClick={createRoom}>START GAME</button>
             <p className="text-2xl font-bold mb-4">OR</p>
             <input
               type="text"
