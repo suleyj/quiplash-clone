@@ -21,13 +21,15 @@ function Home() {
 
     const joinRoom = () => {
         if (!socket.connected) socket.connect();
-        socket.timeout(3000).emit("joinRoom", roomCode, (err: Error, status: boolean) => {
-            if (err || !status) {
-                // TODO: display error
-            } else {
-                return navigate(`/lobbies/${roomCode}`);
-            }
-        });
+        socket
+            .timeout(3000)
+            .emit("joinRoom", roomCode, (err: Error, status: boolean) => {
+                if (err || !status) {
+                    // TODO: display error
+                } else {
+                    return navigate(`/lobbies/${roomCode}`);
+                }
+            });
     };
 
     return (
