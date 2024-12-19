@@ -8,22 +8,24 @@ function Home() {
 
     const createRoom = () => {
         if (!socket.connected) socket.connect();
-        socket.emit("createRoom", (success: boolean, roomCode: string) => {
-            if (success) {
-                return navigate(`/lobbies/${roomCode}`);
-            } else {
-                // TODO: display error
-            }
-        });
+        socket
+            .timeout(3000)
+            .emit("createRoom", (err: Error, roomCode: string) => {
+                if (err) {
+                    // TODO: display error
+                } else {
+                    return navigate(`/lobbies/${roomCode}`);
+                }
+            });
     };
 
     const joinRoom = () => {
         if (!socket.connected) socket.connect();
-        socket.emit("joinRoom", roomCode, (success: boolean) => {
-            if (success) {
-                return navigate(`/lobbies/${roomCode}`);
-            } else {
+        socket.timeout(3000).emit("joinRoom", roomCode, (err: Error, status: boolean) => {
+            if (err || !status) {
                 // TODO: display error
+            } else {
+                return navigate(`/lobbies/${roomCode}`);
             }
         });
     };

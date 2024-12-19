@@ -61,16 +61,12 @@ io.on("connection", (socket) => {
         const roomCode = getRoomCode();
         socket.join(roomCode);
         rooms.push(roomCode);
-        console.log(rooms);
-
-        callback(true, roomCode);
+        callback(roomCode);
     });
 
     socket.on("joinRoom", (roomCode, callback) => {
-        if (!rooms.includes(roomCode)) return;
+        if (!rooms.includes(roomCode)) return callback(false);
         socket.join(roomCode);
-        console.log(`${socket.id} joined room ${roomCode}`);
-
         callback(true);
     });
 
