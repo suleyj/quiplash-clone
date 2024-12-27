@@ -5,23 +5,25 @@ const filePath = path.join(__dirname, "prompts.json");
 const data = fs.readFileSync(filePath, "utf-8");
 
 let questions = JSON.parse(data);
-let index = 0;
 
-const shuffle = (array) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+const questionsForPlayers = (n) => {
+  if (numPlayers > questions.length) {
+    throw new Error("Not enough questions for the number of players.");
   }
+  return questions.slice(0, numPlayers);
 };
 
-const getNextQuestion = () => {
-  if (index >= questions.length) {
-    shuffle(questions);
-    index = 0;
-  }
-  return questions[index++];
+const distributeQuestions = (pool, ids) => {
+  const assignment = {};
+
+  ids.forEach((id, i) => {
+    assignment[id] = [pool[i], pool[(i + 1) % pool.length]];
+  });
+
+  return assignment;
 };
 
 module.exports = {
-  getNextQuestion,
+  questionsForPlayers,
+  distributeQuestions,
 };
