@@ -6,7 +6,7 @@ const data = fs.readFileSync(filePath, "utf-8");
 
 let questions = JSON.parse(data);
 
-const questionsForPlayers = (n) => {
+const questionsForPlayers = (numPlayers) => {
   if (numPlayers > questions.length) {
     throw new Error("Not enough questions for the number of players.");
   }
