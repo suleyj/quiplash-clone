@@ -30,16 +30,33 @@ module.exports = (io) => {
         const playerQuestion = assignment[playerId];
         const currentIndex = index[playerId];
 
-        if (playerQuestion && playerQuestion.length > 0) {
-          const nextQuestion = playerQuestion[currentIndex];
+        if (playerQuestion && currentIndex < 2) {
+          const currentQuestion = playerQuestion[currentIndex];
 
-          if (!answer[playerId]) {
-            answers[playerId] = [];
-          }
+          answers[playerId].push({
+            question: currentQuestion,
+            answer,
+          });
+
           index[playerId]++;
-          socket.emit("newQuestion", { question: nextQuestion });
-        } else {
-          socket.emit("gameOver", { message: "No more questions left." });
+
+          if (index[playerId] < 2) {
+            const nextQuestion = playerQuestion[currentIndex];
+            socket.emit("newQuestion", { question: nextQuestion });
+          } else {
+            socket.emit("awaitingOthers", {
+              message:
+                "You've answered all your questions. Waiting for other players.",
+            });
+          }
+
+          const allPlayersFinished = Object.keys(index).every(
+            (id) => index[id] >= 2
+          );
+
+          if (allPlayersFinished) {
+            io.emit("allAnswersSubmitted", { answers });
+          }
         }
       } catch (error) {
         socket.emit("error", { message: error.message });

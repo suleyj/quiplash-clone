@@ -6,11 +6,20 @@ const data = fs.readFileSync(filePath, "utf-8");
 
 let questions = JSON.parse(data);
 
+const shuffle = (array) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+};
+
 const questionsForPlayers = (numPlayers) => {
   if (numPlayers > questions.length) {
     throw new Error("Not enough questions for the number of players.");
   }
-  return questions.slice(0, numPlayers);
+
+  const shuffledQuestions = shuffle([...questions]);
+  return shuffledQuestions.slice(0, numPlayers);
 };
 
 const distributeQuestions = (pool, ids) => {
@@ -26,4 +35,5 @@ const distributeQuestions = (pool, ids) => {
 module.exports = {
   questionsForPlayers,
   distributeQuestions,
+  shuffle,
 };
