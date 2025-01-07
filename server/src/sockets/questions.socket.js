@@ -21,6 +21,7 @@ module.exports = (io) => {
         });
         io.emit("gameQuestions", { questions });
       } catch (error) {
+        console.error("Error in startGame event: ", error);
         socket.emit("error", { message: error.message });
       }
     });
@@ -42,7 +43,7 @@ module.exports = (io) => {
 
           if (index[playerId] < 2) {
             const nextQuestion = playerQuestion[currentIndex];
-            socket.emit("newQuestion", { question: nextQuestion });
+            socket.emit("nextQuestion", { question: nextQuestion });
           } else {
             socket.emit("awaitingOthers", {
               message:

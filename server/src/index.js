@@ -3,7 +3,7 @@ const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const questionsRoute = require("./routes/questions.route");
+const game = require("./sockets/questions.socket");
 
 dotenv.config();
 const app = express();
@@ -17,6 +17,7 @@ const io = new Server(server, {
 const port = process.env.PORT;
 
 app.use(cors());
+game(io);
 
 const clients = [];
 const rooms = [];
@@ -29,8 +30,6 @@ io.on("connection", (socket) => {
     console.log(rooms);
   });
 });
-
-app.use("/api/question", questionsRoute);
 
 app.get("/test", (req, res) => {
   res.send({ some: "text" });

@@ -11,6 +11,7 @@ const shuffle = (array) => {
     const j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
   }
+  return array;
 };
 
 const questionsForPlayers = (numPlayers) => {
@@ -18,7 +19,7 @@ const questionsForPlayers = (numPlayers) => {
     throw new Error("Not enough questions for the number of players.");
   }
 
-  const shuffledQuestions = shuffle([...questions]);
+  const shuffledQuestions = shuffle(questions);
   return shuffledQuestions.slice(0, numPlayers);
 };
 
