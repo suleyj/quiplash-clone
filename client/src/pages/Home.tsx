@@ -26,6 +26,7 @@ function Home() {
         if (err || !status) {
           // TODO: display error
         } else {
+          return navigate(`/lobbies/${roomCode}`);
         }
       });
   };
