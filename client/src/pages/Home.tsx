@@ -5,6 +5,8 @@ import { useNavigate } from "react-router";
 function Home() {
     let navigate = useNavigate();
     const [roomCode, setRoomCode] = useState("");
+    const [name, setName] = useState("");
+
 
     const createRoom = () => {
         if (!socket.connected) socket.connect();
@@ -23,7 +25,7 @@ function Home() {
         if (!socket.connected) socket.connect();
         socket
             .timeout(3000)
-            .emit("joinRoom", roomCode, (err: Error, status: boolean) => {
+            .emit("joinRoom", {roomCode, name}, (err: Error, status: boolean) => {
                 if (err || !status) {
                     // TODO: display error
                 } else {
@@ -52,16 +54,28 @@ function Home() {
                         CREATE GAME
                     </button>
                     <p className="mb-4 text-2xl font-bold">OR</p>
-                    <input
-                        type="text"
-                        placeholder="Enter Game Code"
-                        className="input input-bordered w-full max-w-[14rem] mr-2"
-                        onChange={(event) => {
-                            setRoomCode(event.target.value);
-                        }}
-                        value={roomCode}
-                    />
-                    <button className="btn btn-primary" onClick={joinRoom}>
+                    <div className="flex flex-col items-center mb-6">
+                        <input
+                            type="text"
+                            placeholder="Enter Game Code"
+                            className="input input-bordered w-full max-w-[14rem] mr-2 mb-4"
+                            onChange={(event) => {
+                                setRoomCode(event.target.value);
+                            }}
+                            value={roomCode}
+                        />
+                        <input
+                            type="text"
+                            placeholder="Enter name"
+                            className="input input-bordered w-full max-w-[14rem] mr-2"
+                            onChange={(event) => {
+                                setName(event.target.value);
+                            }}
+                            value={name}
+                        />
+                    </div>
+
+                    <button className="btn btn-primary" onClick={joinRoom} disabled={!(roomCode && name)}>
                         JOIN
                     </button>
                 </div>
