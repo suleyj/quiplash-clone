@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { socket } from "../socket";
 import { useNavigate } from "react-router";
+import { useGame } from "../GameContext";
 
 function Home() {
     let navigate = useNavigate();
     const [roomCode, setRoomCode] = useState("");
     const [name, setName] = useState("");
+    const { setIsHost } = useGame();
 
 
     const createRoom = () => {
@@ -16,6 +18,7 @@ function Home() {
                 if (err) {
                     // TODO: display error
                 } else {
+                    setIsHost(true)
                     return navigate(`/lobbies/${roomCode}`);
                 }
             });

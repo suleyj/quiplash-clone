@@ -68,7 +68,7 @@ io.on("connection", (socket) => {
     callback(roomCode);
   });
 
-  socket.on("joinRoom", (roomCode, callback) => {
+  socket.on("joinRoom", ({roomCode, name}, callback) => {
     if (!rooms.some((room) => room.code === roomCode)) {
       return callback(false);
     }
@@ -77,7 +77,7 @@ io.on("connection", (socket) => {
 
     // add new player to the room's player list
     const currRoom = rooms.find((room) => room.code === roomCode);
-    currRoom.players.push(socket.id);
+    currRoom.players.push(name);
     rooms.map((room) => {
       if (room.code === roomCode) {
         room = currRoom;
