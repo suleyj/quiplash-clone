@@ -5,9 +5,7 @@ import { useGame } from "../GameContext";
 
 function Home() {
     let navigate = useNavigate();
-    const [roomCode, setRoomCode] = useState("");
-    const [name, setName] = useState("");
-    const { setIsHost } = useGame();
+    const {  playerName, roomCode, setIsHost, setPlayerName, setRoomCode } = useGame();
 
 
     const createRoom = () => {
@@ -28,7 +26,7 @@ function Home() {
         if (!socket.connected) socket.connect();
         socket
             .timeout(3000)
-            .emit("joinRoom", {roomCode, name}, (err: Error, status: boolean) => {
+            .emit("joinRoom", {roomCode, playerName}, (err: Error, status: boolean) => {
                 if (err || !status) {
                     // TODO: display error
                 } else {
@@ -72,13 +70,13 @@ function Home() {
                             placeholder="Enter name"
                             className="input input-bordered w-full max-w-[14rem] mr-2"
                             onChange={(event) => {
-                                setName(event.target.value);
+                                setPlayerName(event.target.value);
                             }}
-                            value={name}
+                            value={playerName}
                         />
                     </div>
 
-                    <button className="btn btn-primary" onClick={joinRoom} disabled={!(roomCode && name)}>
+                    <button className="btn btn-primary" onClick={joinRoom} disabled={!(roomCode && playerName)}>
                         JOIN
                     </button>
                 </div>
