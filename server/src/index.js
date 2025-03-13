@@ -3,7 +3,11 @@ const { createServer } = require("node:http");
 const { Server } = require("socket.io");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const questionsRoute = require("./routes/questions.route");
+const {
+  questionsForPlayers,
+  distributeQuestions,
+} = require("./utils/questionsUtils");
+const { error } = require("node:console");
 
 dotenv.config();
 const app = express();
@@ -64,28 +68,37 @@ io.on("connection", (socket) => {
   socket.on("createRoom", (callback) => {
     const roomCode = getRoomCode();
     socket.join(roomCode);
-    rooms.push({ code: roomCode, players: [] });
+    rooms.push({ code: roomCode, players: [] , questionBank: [] , round: 1, start: false});
     callback(roomCode);
   });
 
-  socket.on("joinRoom", ({roomCode, name}, callback) => {
+  socket.on("joinRoom", ({roomCode, playerName}, callback) => {
     if (!rooms.some((room) => room.code === roomCode)) {
       return callback(false);
     }
     socket.join(roomCode);
-    callback(true);
-
-    // add new player to the room's player list
     const currRoom = rooms.find((room) => room.code === roomCode);
-    currRoom.players.push(name);
-    rooms.map((room) => {
-      if (room.code === roomCode) {
-        room = currRoom;
-      }
-    });
+    currRoom.players.push({ name: playerName, questions: {}, answers: {}, score: 0});
+    io.to(roomCode).emit("playerList", currRoom.players.map(p => p.name));
+    callback(true)
+  });
 
-    // send the updated player list to all clients in the room
-    io.to(roomCode).emit("playerList", currRoom.players);
+  socket.on("startGame", (roomCode, callback) => {
+    const currRoom = rooms.find((room) => room.code === roomCode);
+    if(!currRoom){
+      callback('Invalid room code', false);
+    }
+    
+    const questions = questionsForPlayers(currRoom.players.length); 
+    currRoom.questions = questions
+
+    for (let j = 0; j < currRoom.players.length; j++) {
+      currRoom.questions.forEach((q,i) => {
+        currRoom.players[i].questions[i] = q;
+        currRoom.players[i].answers[i] = '';
+      });
+    }
+    callback(null, true)
   });
 
   socket.on("disconnect", () => {
@@ -94,12 +107,6 @@ io.on("connection", (socket) => {
     const index = clients.indexOf(socket);
     clients.splice(index, 1);
   });
-});
-
-app.use("/api/question", questionsRoute);
-
-app.get("/test", (req, res) => {
-  res.send({ some: "text" });
 });
 
 server.listen(port, () => {
