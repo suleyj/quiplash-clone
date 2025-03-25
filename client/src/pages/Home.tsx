@@ -1,11 +1,12 @@
 import { socket } from "../socket";
 import { useNavigate } from "react-router";
 import { useGame } from "../GameContext";
+import { useState } from 'react'    
 
 function Home() {
     let navigate = useNavigate();
-    const {  playerName, roomCode, setIsHost, setPlayerName, setRoomCode } = useGame();
-
+    const { roomCode, setRoomCode } = useGame();
+    const [playerName, setPlayerName] = useState(''); 
 
     const createRoom = () => {
         if (!socket.connected) socket.connect();
@@ -15,8 +16,7 @@ function Home() {
                 if (err) {
                     // TODO: display error
                 } else {
-                    setIsHost(true)
-                    return navigate(`/lobbies/${roomCode}`);
+                    return navigate(`/host/${roomCode}`);
                 }
             });
     };
@@ -29,7 +29,7 @@ function Home() {
                 if (err || !status) {
                     // TODO: display error
                 } else {
-                    return navigate(`/lobbies/${roomCode}`);
+                    return navigate(`/player/${roomCode}`);
                 }
             });
     };

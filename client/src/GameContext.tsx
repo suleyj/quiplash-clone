@@ -1,15 +1,19 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
-interface GameContextType {
-  isHost: boolean;
-  setIsHost: (host: boolean) => void;
-  playerName: string;
-  setPlayerName: (playerName: string) => void;
-  roomCode: string;
-  setRoomCode: (roomCode: string) => void;
+interface Player {
+  name: string;
 }
 
-// Create context with a default value of `null`
+interface GameContextType {
+  roomCode: string;
+  setRoomCode: (roomCode: string) => void;
+  gameState: "lobby" | "answering" | "voting" | "results";
+  setGameState: (state: "lobby" | "answering" | "voting" | "results") => void;
+  players: Player[];
+  setPlayers: (players: Player[]) => void;
+  startGame: () => void;
+}
+
 const GameContext = createContext<GameContextType | null>(null);
 
 interface GameProviderProps {
@@ -17,12 +21,26 @@ interface GameProviderProps {
 }
 
 export function GameProvider({ children }: GameProviderProps) {
-  const [isHost, setIsHost] = useState<boolean>(false);
-  const [playerName, setPlayerName] = useState<string>("");
   const [roomCode, setRoomCode] = useState<string>("");
+  const [gameState, setGameState] = useState<"lobby" | "answering" | "voting" | "results">("lobby");
+  const [players, setPlayers] = useState<Player[]>([]);
+
+  const startGame = () => {
+      setGameState("answering");
+  };
 
   return (
-    <GameContext.Provider value={{ isHost, setIsHost , playerName, setPlayerName, roomCode, setRoomCode}}>
+    <GameContext.Provider
+      value={{
+        roomCode,
+        setRoomCode,
+        gameState,
+        setGameState,
+        players,
+        setPlayers,
+        startGame,
+      }}
+    >
       {children}
     </GameContext.Provider>
   );
