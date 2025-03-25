@@ -68,7 +68,7 @@ io.on("connection", (socket) => {
   socket.on("createRoom", (callback) => {
     const roomCode = getRoomCode();
     socket.join(roomCode);
-    rooms.push({ code: roomCode, players: [] , questionBank: [] , round: 1, start: false});
+    rooms.push({ host: socket.id, code: roomCode, players: [] , questionBank: [] , round: 1, start: false});
     callback(roomCode);
   });
 
@@ -78,7 +78,7 @@ io.on("connection", (socket) => {
     }
     socket.join(roomCode);
     const currRoom = rooms.find((room) => room.code === roomCode);
-    currRoom.players.push({ name: playerName, questions: {}, answers: {}, score: 0});
+    currRoom.players.push({ playerId: socket.id, name: playerName, questions: {}, answers: {}, score: 0});
     io.to(roomCode).emit("playerList", currRoom.players.map(p => p.name));
     callback(true)
   });
