@@ -9,7 +9,7 @@ const Host = () => {
     <div>
       <h1>Host Screen</h1>
       {gameState === 'lobby' && <Lobby />}
-      {gameState === 'answering' && <div>Waiting For Users to answer Questions</div>}
+      {gameState === 'qna' && <div>Waiting For Users to answer Questions</div>}
     </div>
   );
 };

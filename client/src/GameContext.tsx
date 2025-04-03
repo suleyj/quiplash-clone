@@ -7,11 +7,10 @@ interface Player {
 interface GameContextType {
   roomCode: string;
   setRoomCode: (roomCode: string) => void;
-  gameState: "lobby" | "answering" | "voting" | "results";
-  setGameState: (state: "lobby" | "answering" | "voting" | "results") => void;
+  gameState: "lobby" | "qna" | "voting" | "results";
+  setGameState: (state: "lobby" | "qna" | "voting" | "results") => void;
   players: Player[];
   setPlayers: (players: Player[]) => void;
-  startGame: () => void;
 }
 
 const GameContext = createContext<GameContextType | null>(null);
@@ -22,13 +21,10 @@ interface GameProviderProps {
 
 export function GameProvider({ children }: GameProviderProps) {
   const [roomCode, setRoomCode] = useState<string>("");
-  const [gameState, setGameState] = useState<"lobby" | "answering" | "voting" | "results">("lobby");
+  const [gameState, setGameState] = useState<"lobby" | "qna" | "voting" | "results">("lobby");
   const [players, setPlayers] = useState<Player[]>([]);
 
-  const startGame = () => {
-      setGameState("answering");
-  };
-
+  
   return (
     <GameContext.Provider
       value={{
@@ -38,7 +34,6 @@ export function GameProvider({ children }: GameProviderProps) {
         setGameState,
         players,
         setPlayers,
-        startGame,
       }}
     >
       {children}

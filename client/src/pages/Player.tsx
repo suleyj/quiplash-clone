@@ -1,11 +1,28 @@
 import { useGame } from "../GameContext";
+import { useEffect } from 'react'
+import { socket } from "../socket";
+
+type GameState = "lobby" | "qna" | "voting" | "results";
 
 function Player() {
-    const { gameState } = useGame();
+    const { gameState, setGameState } = useGame();
+
+    useEffect(() => {
+        const handleGameState = (gameState: GameState) => {
+          setGameState(gameState);
+        };
+
+        socket.on("gameState", handleGameState);
+
+        return () => {
+            socket.off("gameState", handleGameState);
+        };
+    }, []);
+
   return (
     <div>
       {gameState === 'lobby' && <div>Waiting for game to start</div>}
-      {gameState === 'answering' && <div>Answer</div>}
+      {gameState === 'qna' && <div>Answer</div>}
     </div>
   )
 }

@@ -68,7 +68,9 @@ io.on("connection", (socket) => {
   socket.on("createRoom", (callback) => {
     const roomCode = getRoomCode();
     socket.join(roomCode);
-    rooms.push({ host: socket.id, code: roomCode, players: [] , questionBank: [] , round: 1, start: false});
+    rooms.push({ host: socket.id, gameState: 'Lobby', code: roomCode, players: [] , questionBank: [] , round: 1, start: false});
+    console.log(rooms);
+    
     callback(roomCode);
   });
 
@@ -98,6 +100,12 @@ io.on("connection", (socket) => {
         currRoom.players[i].answers[i] = '';
       });
     }
+    
+    currRoom.gameState = 'qna';
+
+    io.to(currRoom.players[0].playerId).emit("receiveQuestions", currRoom.players[0].questions);
+
+    io.to(roomCode).emit("gameState", currRoom.gameState);
     callback(null, true)
   });
 
