@@ -7,13 +7,15 @@ function QNA() {
 
   useEffect(() => {
       const handleQuestion = (question: string) => {
+        console.log(question);
+        
         setQuestion(question);
       };
 
-      socket.on("question", handleQuestion);
+      socket.on("receiveQuestions", handleQuestion);
 
       return () => {
-          socket.off("question", handleQuestion);
+          socket.off("receiveQuestions", handleQuestion);
       };
   }, []);
 

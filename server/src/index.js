@@ -103,9 +103,12 @@ io.on("connection", (socket) => {
     
     currRoom.gameState = 'qna';
 
-    io.to(currRoom.players[0].playerId).emit("receiveQuestions", currRoom.players[0].questions);
-
+    console.log(currRoom.players[0].questions[0]);
+    
+    
     io.to(roomCode).emit("gameState", currRoom.gameState);
+    
+    io.to(currRoom.players[0].playerId).emit("receiveQuestions", currRoom.players[0].questions[0]);
     callback(null, true)
   });
 

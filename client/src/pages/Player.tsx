@@ -1,6 +1,7 @@
 import { useGame } from "../GameContext";
 import { useEffect } from 'react'
 import { socket } from "../socket";
+import QNA from '../components/QNA'
 
 type GameState = "lobby" | "qna" | "voting" | "results";
 
@@ -22,7 +23,7 @@ function Player() {
   return (
     <div>
       {gameState === 'lobby' && <div>Waiting for game to start</div>}
-      {gameState === 'qna' && <div>Answer</div>}
+      {gameState === 'qna' && <QNA/>}
     </div>
   )
 }
