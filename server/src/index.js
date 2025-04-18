@@ -68,48 +68,76 @@ io.on("connection", (socket) => {
   socket.on("createRoom", (callback) => {
     const roomCode = getRoomCode();
     socket.join(roomCode);
-    rooms.push({ host: socket.id, gameState: 'Lobby', code: roomCode, players: [] , questionBank: [] , round: 1, start: false});
+    rooms.push({
+      host: socket.id,
+      gameState: "Lobby",
+      code: roomCode,
+      players: [],
+      question: [],
+      assignedQuestions: [],
+      answers: [],
+      round: 1,
+      start: false,
+    });
     console.log(rooms);
-    
+
     callback(roomCode);
   });
 
-  socket.on("joinRoom", ({roomCode, playerName}, callback) => {
+  socket.on("joinRoom", ({ roomCode, playerName }, callback) => {
     if (!rooms.some((room) => room.code === roomCode)) {
       return callback(false);
     }
     socket.join(roomCode);
     const currRoom = rooms.find((room) => room.code === roomCode);
-    currRoom.players.push({ playerId: socket.id, name: playerName, questions: {}, answers: {}, score: 0});
-    io.to(roomCode).emit("playerList", currRoom.players.map(p => p.name));
-    callback(true)
+    currRoom.players.push({ playerId: socket.id, name: playerName, score: 0 });
+    io.to(roomCode).emit(
+      "playerList",
+      currRoom.players.map((p) => p.name)
+    );
+    callback(true);
   });
 
   socket.on("startGame", (roomCode, callback) => {
     const currRoom = rooms.find((room) => room.code === roomCode);
-    if(!currRoom){
-      callback('Invalid room code', false);
+    if (!currRoom) {
+      callback("Invalid room code", false);
     }
-    
-    const questions = questionsForPlayers(currRoom.players.length); 
-    currRoom.questions = questions
 
-    for (let j = 0; j < currRoom.players.length; j++) {
-      currRoom.questions.forEach((q,i) => {
-        currRoom.players[i].questions[i] = q;
-        currRoom.players[i].answers[i] = '';
+    const questions = questionsForPlayers(currRoom.players.length);
+
+    currRoom.questions = questions;
+
+    for (let i = 0; i < questions.length; i++) {
+      currRoom.assignedQuestions.push({
+        playerName: currRoom.players[i].name,
+        questionId: i,
+      });
+      currRoom.assignedQuestions.push({
+        playerName: currRoom.players[i].name,
+        questionId: (i + 1) % questions.length,
       });
     }
-    
-    currRoom.gameState = 'qna';
 
-    console.log(currRoom.players[0].questions[0]);
-    
-    
+    console.log(currRoom.assignedQuestions);
+
+    currRoom.gameState = "qna";
+
     io.to(roomCode).emit("gameState", currRoom.gameState);
-    
-    io.to(currRoom.players[0].playerId).emit("receiveQuestions", currRoom.players[0].questions[0]);
-    callback(null, true)
+
+    for (let i = 0; i < currRoom.players.length; i++) {
+      const player = currRoom.players[i];
+
+      const q1 = currRoom.assignedQuestions.find(
+        (assignedQuestion) => assignedQuestion.playerName === player.name
+      )?.questionId;
+
+      if (q1 !== undefined) {
+        io.to(player.playerId).emit("receiveQuestions", currRoom.questions[q1]);
+      }
+    }
+
+    callback(null, true);
   });
 
   socket.on("disconnect", () => {
