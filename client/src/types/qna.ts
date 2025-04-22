@@ -6,6 +6,7 @@ type Question = {
 type Answer = {
   questionId: number;
   answer: string;
+  votes: [];
 };
 
 export type { Answer, Question };

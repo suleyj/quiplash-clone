@@ -4,7 +4,7 @@ const {
 } = require("../utils/questionsUtils");
 const { Room } = require("../Room");
 
-module.exports = (socket) => {
+module.exports = (socket, io) => {
   socket.on("startGame", (roomCode, callback) => {
     try {
       const room = Room.get(roomCode);
@@ -39,10 +39,6 @@ module.exports = (socket) => {
 
     // check if every player has submitted their answers
     if (room.players.every((p) => p.answers && p.answers.length == 2)) {
-      // update gameState
-      room.gameState = "voting";
-      socket.to(roomCode).emit("gameState", "voting");
-
       let votingInfo = [];
       Object.entries(room.questionBank).forEach((entry) => {
         let answers = new Set();
@@ -63,8 +59,60 @@ module.exports = (socket) => {
           answers: Array.from(answers),
         });
       });
-      socket.to(roomCode).emit("voting", votingInfo);
+
+      // update gameState
+      room.gameState = "voting";
+      io.to(roomCode).emit("gameState", "voting");
+
+      room.players.forEach((player) => {
+        io.to(player.id).emit("voting", votingInfo);
+      });
     }
+  });
+
+  socket.on("sendVotes", ({ roomCode, votes }) => {
+    const room = Room.get(roomCode);
+    votes.map((vote) => {
+      console.log(vote);
+      // Find the player who has answered the question
+      let player = room.players.find((player) => {
+        // Find the answer in the player's answers list
+        return player.answers.find((answer) => {
+          // Check if the answer matches the questionId and the vote's answer
+          return (
+            answer.questionId === vote.questionId &&
+            answer.answer === vote.answer
+          );
+        });
+      });
+
+      console.log(player);
+
+      if (player) {
+        // Find the correct answer object that matches the questionId and answer
+        let answer = player.answers.find(
+          (answer) =>
+            answer.questionId === vote.questionId &&
+            answer.answer === vote.answer
+        );
+
+        console.log(answer);
+
+        if (answer) {
+          // Add the socket.id to the answer's votes array
+          answer.votes.push(socket.id);
+
+          // Increase the player's score by 100
+          player.score += 100;
+        }
+      }
+    });
+
+    room.players.forEach((player) => console.log(player.answers.votes));
+
+    // update gameState
+    // room.gameState = "voting";
+    // io.to(roomCode).emit("gameState", "results");
   });
 
   // socket.on("disconnect", () => {

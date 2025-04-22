@@ -55,7 +55,7 @@ io.on("connection", (socket) => {
     Room.disconnect(socket.id);
   });
 
-  require("./sockets/questions.socket")(socket);
+  require("./sockets/questions.socket")(socket, io);
 });
 
 server.listen(port, () => {

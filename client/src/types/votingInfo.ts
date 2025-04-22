@@ -9,4 +9,9 @@ type Answer = {
   answer: string;
 };
 
-export type { VotingInfo, Answer };
+type Vote = {
+  questionId: number;
+  answer: number;
+};
+
+export type { VotingInfo, Answer, Vote };

@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { VotingInfo } from "../types/votingInfo";
 
 const Host = () => {
+  const [roundNumber, setRoundNumber] = useState(1);
   const { gameState } = useGame();
   const [votingInfo, setVotingInfo] = useState<VotingInfo[]>([]);
 
@@ -24,13 +25,19 @@ const Host = () => {
         <div className="max-w-2xl flex flex-col gap-3">
           <h1>Host Screen</h1>
           {gameState === "lobby" && <Lobby />}
+          {(gameState === "qna" || gameState === "voting") && (
+            <h1 className="text-5xl font-bold">Round #{roundNumber}</h1>
+          )}
           {gameState === "qna" && (
             <>
               <div>Waiting For Users to answer Questions</div>
-              <Timer />
             </>
           )}
-          {gameState === "voting" && <Voting votingInfo={votingInfo} />}
+          {gameState === "voting" && (
+            <>
+              <div>Waiting For Users to vote</div>
+            </>
+          )}
         </div>
       </div>
     </div>

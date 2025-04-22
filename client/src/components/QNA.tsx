@@ -13,7 +13,7 @@ function QNA({ questions }: { questions: Question[] }) {
   const submitAnswer = () => {
     const newAnswers = [
       ...answers,
-      { questionId: questions[numQuestion].id, answer: answer },
+      { questionId: questions[numQuestion].id, answer: answer, votes: [] },
     ];
     setAnswers(newAnswers);
 
@@ -27,25 +27,27 @@ function QNA({ questions }: { questions: Question[] }) {
 
   return (
     <div className="max-w-2xl flex flex-col gap-3">
-      <h1 className="text-5xl font-bold">Question #{numQuestion + 1}</h1>
-      <h1>
-        {numQuestion <= questions.length &&
-          questions[numQuestion] &&
-          questions[numQuestion].question}
-      </h1>
-      <textarea
-        className="textarea"
-        placeholder="Answer"
-        value={answer}
-        onChange={(event) => setAnswer(event.target.value)}
-      />
-      <button
-        className="mb-4 btn btn-primary"
-        onClick={submitAnswer}
-        disabled={!answer}
-      >
-        SUBMIT
-      </button>
+      {numQuestion < questions.length ? (
+        <>
+          <h1 className="text-5xl font-bold">Question #{numQuestion + 1}</h1>
+          <h1>{questions[numQuestion].question}</h1>
+          <textarea
+            className="textarea"
+            placeholder="Answer"
+            value={answer}
+            onChange={(event) => setAnswer(event.target.value)}
+          />
+          <button
+            className="mb-4 btn btn-primary"
+            onClick={submitAnswer}
+            disabled={!answer}
+          >
+            SUBMIT
+          </button>
+        </>
+      ) : (
+        <div>Waiting For Voting</div>
+      )}
     </div>
   );
 }
