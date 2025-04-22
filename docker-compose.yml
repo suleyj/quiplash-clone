@@ -1,0 +1,27 @@
+
+services:
+  client:
+    build:
+      context: .
+      dockerfile: ./client/dockerfile
+    ports:
+      - "5173:5173"  # Expose React app on port 5173
+    networks:
+      - myapp-network
+
+  server:
+    build:
+      context: .
+      dockerfile: ./server/dockerfile
+    ports:
+      - "3000:3000"  # Expose Express server on port 3000
+    networks:
+      - myapp-network
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ./server/src/.env
+
+networks:
+  myapp-network:
+    driver: bridge
