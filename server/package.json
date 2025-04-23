@@ -3,9 +3,6 @@
   "version": "0.0.1",
   "description": "creampuff quiplash clone",
   "main": "src/index.js",
-  "scripts": {
-    "dev": "nodemon src/index.js"
-  },
   "type": "commonjs",
   "scripts": {
     "start": "nodemon index.js"
