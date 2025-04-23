@@ -70,23 +70,18 @@ module.exports = (socket, io) => {
     }
   });
 
+  //TODO fix this logic
   socket.on("sendVotes", ({ roomCode, votes }) => {
-    const room = Room.get(roomCode);
+    const room = Room.get(roomCode); 
     votes.map((vote) => {
-      console.log(vote);
-      // Find the player who has answered the question
       let player = room.players.find((player) => {
-        // Find the answer in the player's answers list
         return player.answers.find((answer) => {
-          // Check if the answer matches the questionId and the vote's answer
           return (
             answer.questionId === vote.questionId &&
             answer.answer === vote.answer
           );
         });
       });
-
-      console.log(player);
 
       if (player) {
         // Find the correct answer object that matches the questionId and answer

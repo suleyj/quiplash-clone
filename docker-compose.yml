@@ -8,6 +8,8 @@ services:
       - "5173:5173"  # Expose React app on port 5173
     networks:
       - myapp-network
+    volumes:
+      - ./client:/src
 
   server:
     build:
@@ -21,6 +23,9 @@ services:
       - NODE_ENV=production
     env_file:
       - ./server/src/.env
+    volumes:
+      - ./server:/src
+    restart: unless-stopped
 
 networks:
   myapp-network:

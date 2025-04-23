@@ -12,6 +12,7 @@ function Voting({ votingInfo }: { votingInfo: VotingInfo[] }) {
       {
         questionId: votingInfo[voteIndex].questionId,
         answer: event.target.value,
+        playerId: votingInfo[voteIndex].answers.find( answer => answer.answer === event.target.value )?.id
       },
     ];
     setVotes(newVotes);
@@ -50,7 +51,7 @@ function Voting({ votingInfo }: { votingInfo: VotingInfo[] }) {
           )}
         </div>
       ) : (
-        <div className="max-w-2xl flex flex-col gap-3">
+        <div className="flex flex-col max-w-2xl gap-3">
           <div>Waiting For Next Round</div>
         </div>
       )}
