@@ -1,11 +1,10 @@
+require("dotenv").config();
 const express = require("express");
 const { createServer } = require("node:http");
 const { Server } = require("socket.io");
-const dotenv = require("dotenv");
 const cors = require("cors");
-const game = require("./sockets/questions.socket");
+const { Room, getRoomCode } = require("./Room");
 
-dotenv.config();
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
@@ -15,24 +14,48 @@ const io = new Server(server, {
 });
 
 const port = process.env.PORT;
-
 app.use(cors());
-game(io);
-
-const clients = [];
-const rooms = [];
 
 io.on("connection", (socket) => {
-  clients.push(socket);
-  socket.on("createRoom", (socket) => {
-    // socket.join(`room-${rooms.length}`);
-    rooms.push(`rooms-${rooms.length}`);
-    console.log(rooms);
-  });
-});
+  console.log(`${socket.id} connected`);
 
-app.get("/test", (req, res) => {
-  res.send({ some: "text" });
+  socket.on("createRoom", (callback) => {
+    const roomCode = getRoomCode();
+    Room.add(roomCode, socket.id);
+    socket.join(roomCode);
+
+    callback(roomCode);
+  });
+
+  socket.on("joinRoom", ({ roomCode, playerName }, callback) => {
+    const currRoom = Room.get(roomCode);
+    if (!roomCode) {
+      return callback(false);
+    }
+
+    socket.join(roomCode);
+    currRoom.addPlayer({
+      id: socket.id,
+      name: playerName,
+      questions: {},
+      answers: {},
+      score: 0,
+    });
+
+    io.to(roomCode).emit(
+      "playerList",
+      currRoom.players.map((p) => p.name)
+    );
+
+    callback(true);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`${socket.id} disconnected`);
+    Room.disconnect(socket.id);
+  });
+
+  require("./sockets/questions.socket")(socket, io);
 });
 
 server.listen(port, () => {

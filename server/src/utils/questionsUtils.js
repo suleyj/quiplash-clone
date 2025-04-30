@@ -19,15 +19,21 @@ const questionsForPlayers = (numPlayers) => {
     throw new Error("Not enough questions for the number of players.");
   }
 
-  const shuffledQuestions = shuffle(questions);
-  return shuffledQuestions.slice(0, numPlayers);
+  const questionsObj = {};
+  questions.slice(0, numPlayers).forEach((q, i) => (questionsObj[i] = q));
+  return questionsObj;
 };
 
 const distributeQuestions = (pool, ids) => {
   const assignment = {};
 
   ids.forEach((id, i) => {
-    assignment[id] = [pool[i], pool[(i + 1) % pool.length]];
+    const q1 = { id: i, question: pool[i] };
+    const q2 = {
+      id: (i + 1) % Object.keys(pool).length,
+      question: pool[(i + 1) % Object.keys(pool).length],
+    };
+    assignment[id] = [q1, q2];
   });
 
   return assignment;
